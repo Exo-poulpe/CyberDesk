@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Remote Mobile</title>
+    <link rel="stylesheet" href="mobile.css">
+</head>
+
+<body>
+
+    <div class="mobile">
+
+        <!-- ─── BARRE DU HAUT ───────────────────────────── -->
+        <div class="mobile-top">
+            <span id="clock">--:--</span>
+            <span>🔋 84%</span>
+            <span>📶 WiFi</span>
+        </div>
+
+        <!-- ─── ÉCRAN CENTRAL (il change) ───────────────── -->
+        <div id="screen">
+
+            <!-- Accueil par défaut -->
+            <div class="home" id="homeScreen">
+                <div class="icons">
+                    <div class="app-icon" onclick="openApp('SMS')">
+                        <img src="https://cdn-icons-png.flaticon.com/512/14816/14816282.png" width="48" height="48"
+                            alt="SMS">
+                        <span>SMS</span>
+                    </div>
+                    <div class="app-icon" onclick="openApp('BANK')">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2830/2830289.png" width="48" height="48"
+                            alt="BANK">
+                        <span>BANK</span>
+                    </div>
+                    <div class="app-icon" onclick="openApp('Notes')">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075908.png" width="48" height="48"
+                            alt="Notes">
+                        <div style="text-align:center; font-size:12px; margin-top:4px;">Notes</div>
+                    </div>
+                    <div class="app-icon" onclick="openApp('Facebook')">
+                        <img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" width="48" height="48"
+                            alt="Facebook">
+                        <div style="text-align:center; font-size:12px; margin-top:4px;">Facebook</div>
+                    </div>
+                    <div class="app-icon" onclick="openApp('WhatsApp')">
+                        <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" width="48" height="48"
+                            alt="WhatsApp">
+                        <div style="text-align:center; font-size:12px; margin-top:4px;">WhatsApp</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Application SMS (cachée au départ) -->
+        <div class="app" id="smsScreen">
+            <div class="sms-header">Messages</div>
+
+            <div class="sms-list" id="smsList">
+                <div class="sms-item" onclick="openConversation('33612345678')">+33612345678</div>
+                <div class="sms-item" onclick="openConversation('Bank')">Bank</div>
+                <div class="sms-item" onclick="openConversation('Mum')">Mum</div>
+            </div>
+
+            <div class="sms-chat" id="smsChat" hidden>
+                <div class="sms-header" id="chatTitle">Chat</div>
+                <div class="sms-messages" id="chatBox"></div>
+                <button class="btn" onclick="showSmsList()">← Back</button>
+            </div>
+        </div>
+
+
+        <!-- Application BANK (cachée au départ) -->
+        <div class="app" id="bankScreen">
+
+            <div class="bank-header">My Bank</div>
+
+            <!-- écran d’accueil du compte -->
+            <div class="bank-body" id="bankHome">
+                <p>Current balance</p>
+                <h2 id="balanceValue" style="color:#81d4fa;">$12 345.67</h2>
+
+                <input id="transferAmount" class="bank-input" type="number" min="1" placeholder="$ amount">
+                <button class="btn" onclick="initiateTransfer()">Transfer Money</button>
+            </div>
+
+            <!-- écran de vérification SMS -->
+            <div class="bank-body" id="bankVerify" hidden>
+                <p>Enter the 4-digit code sent by SMS :</p>
+                <input id="bankCodeInput" type="text" maxlength="4" class="bank-input">
+                <button class="btn" onclick="verifyBankCode()">Verify</button>
+                <p id="bankStatus" style="margin-top:10px;"></p>
+            </div>
+        </div>
+
+
+        <!-- ─── BARRE DU BAS ─────────────────────────────── -->
+        <div class="mobile-footer">
+
+            <button class="btn" title="Back" onclick="backToList()">
+                <img src="https://cdn-icons-png.flaticon.com/512/130/130882.png" onclick="goBack()" alt="Back"
+                    width="24" height="24">
+            </button>
+            <button class="btn" title="Home" onclick="backToList()">
+                <img src="https://cdn-icons-png.flaticon.com/512/545/545666.png" onclick="goHome()" alt="Home"
+                    width="24" height="24">
+            </button>
+            <button class="btn" title="Apps">
+                <img src="https://cdn-icons-png.flaticon.com/512/6751/6751364.png" onclick="goHome()" alt="Apps"
+                    width="24" height="24">
+            </button>
+        </div>
+
+    </div>
+
+    <script src="mobile.js"></script>
+    <script src="confetti.min.js"></script>
+</body>
+
+</html>

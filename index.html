@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CyberDesk</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0f1a20;
+      background-image: url('https://www.kali.org/wallpapers/images/2022/kali-small-logo2.png');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: #cfd8dc;
+    }
+
+    .desktop {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 30px;
+      gap: 30px;
+    }
+
+    .app-icon {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      width: 100px;
+    }
+
+    .app-icon img {
+      width: 64px;
+      height: 64px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 10px;
+      border: 1px solid #607d8b;
+    }
+
+    .app-icon span {
+      margin-top: 8px;
+      font-size: 14px;
+      text-align: center;
+      color: #cfd8dc;
+    }
+
+    .window {
+      position: absolute;
+      top: 100px;
+      left: 100px;
+      width: 600px;
+      background: #1e2a33;
+      border: 1px solid #607d8b;
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.1);
+      display: none;
+      flex-direction: column;
+      resize: both;
+      overflow: hidden;
+      border-radius: 4px;
+    }
+
+    .window-header {
+      background: #263238;
+      padding: 10px;
+      color: #cfd8dc;
+      cursor: move;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: bold;
+    }
+
+    .close-btn {
+      color: #ef5350;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .window-body {
+      flex: 1;
+      padding: 15px;
+      color: #cfd8dc;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .field {
+      margin-bottom: 10px;
+    }
+
+    input,
+    select,
+    button {
+      font-family: 'Segoe UI', sans-serif;
+      background: #263238;
+      color: #cfd8dc;
+      border: 1px solid #455a64;
+      padding: 8px;
+      border-radius: 4px;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 5px;
+      margin: 10px 0;
+    }
+
+    .grid div {
+      border: 1px solid #78909c;
+      padding: 10px;
+      text-align: center;
+      color: white;
+      background: #37474f;
+      border-radius: 3px;
+    }
+
+    .status {
+      font-weight: bold;
+      color: #81d4fa;
+      margin-top: 10px;
+    }
+
+    .legal {
+      font-size: 12px;
+      border-top: 1px solid #546e7a;
+      padding-top: 5px;
+      color: #90a4ae;
+    }
+
+    .terminal-output {
+      background: #263238;
+      color: #eceff1;
+      font-size: 13px;
+      padding: 10px;
+      border: 1px solid #455a64;
+      height: 200px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      border-radius: 4px;
+    }
+
+    .file-explorer {
+      background: #37474f;
+      border: 1px solid #607d8b;
+      border-radius: 4px;
+      padding: 10px;
+      margin-top: 10px;
+      max-height: 300px;
+      overflow-y: auto;
+      box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
+    }
+
+    .file-item {
+      padding: 6px 10px;
+      margin: 2px 0;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .file-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .file-item.locked {
+      color: #ef5350;
+      cursor: not-allowed;
+    }
+
+    .explorer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .explorer-path {
+      font-size: 13px;
+      color: #90a4ae;
+    }
+
+    .file-popup {
+      position: fixed;
+      top: 100px;
+      left: 100px;
+      width: 500px;
+      background: #1e2a33;
+      border: 1px solid #607d8b;
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+      border-radius: 6px;
+      padding: 0;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      font-family: 'Courier New', monospace;
+    }
+
+    .file-popup-header {
+      background: #263238;
+      padding: 8px 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #cfd8dc;
+      font-weight: bold;
+      cursor: move;
+    }
+
+    .file-popup-body {
+      padding: 10px;
+      white-space: pre-wrap;
+      overflow-y: auto;
+      max-height: 300px;
+      font-size: 13px;
+      color: #eceff1;
+    }
+
+    .file-popup button {
+      border: none;
+      background: #455a64;
+      color: white;
+      padding: 6px 12px;
+      margin: 10px;
+      align-self: flex-end;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="desktop">
+    <div class="app-icon" onclick="openWindow('bruteforceWindow')">
+      <img src="https://cdn-icons-png.flaticon.com/512/18405/18405224.png" alt="Password Cracker">
+      <span>BruteForce</span>
+    </div>
+    <div class="app-icon" onclick="openWindow('decryptorWindow')">
+      <img src="https://cdn-icons-png.flaticon.com/512/18239/18239944.png" alt="Decryptor">
+      <span>Decryptor</span>
+    </div>
+    <div class="app-icon" onclick="openWindow('remoteDesktopWindow')">
+      <img src="https://cdn-icons-png.flaticon.com/512/3064/3064197.png" alt="Desktop Connection">
+      <span>Remote File Explorer</span>
+    </div>
+    <div class="app-icon" onclick="openWindow('phishingWindow')">
+      <img src="https://cdn-icons-png.flaticon.com/512/3178/3178158.png " alt="Phishing">
+      <span>Phishing</span>
+    </div>
+    <div class="app-icon" onclick="openWindow('mobileControlWindow')">
+      <img src="https://cdn-icons-png.flaticon.com/512/1069/1069893.png" alt="Mobile Control">
+      <span>Mobile Control</span>
+    </div>
+    <div class="app-icon" onclick="openWindow('networkScannerWindow')">
+      <img src="https://cdn-icons-png.flaticon.com/512/2082/2082812.png" alt="Network Scanner">
+      <span>Net Scanner</span>
+    </div>
+    <div class="app-icon" onclick="openWindow('pegasusWindow')">
+      <img src="https://cdn-icons-png.flaticon.com/512/15962/15962748.png" alt="Pegasus">
+      <span>Pegasus</span>
+    </div>
+  </div>
+
+  <!-- BRUTEFORCE WINDOW -->
+  <div class="window" id="bruteforceWindow">
+    <div class="window-header" onmousedown="startDrag(event, 'bruteforceWindow')">
+      Password Cracker <span class="close-btn" onclick="closeWindow('bruteforceWindow')">X</span>
+    </div>
+    <div class="window-body">
+      <div class="field">
+        Target: <input type="text" id="targetIp" value="192.168.1.1">
+        Username: <input type="text" id="username" value="username">
+      </div>
+      <div class="field">
+        Wordlist:
+        <select id="wordlist">
+          <option>rockyou.txt</option>
+          <option>common-passwords.txt</option>
+          <option>top1000.txt</option>
+        </select>
+      </div>
+      <div class="grid" id="bruteGrid">
+        <div>X</div>
+        <div>X</div>
+        <div>X</div>
+        <div>X</div>
+        <div>X</div>
+        <div>X</div>
+        <div>X</div>
+        <div>X</div>
+      </div>
+      <div class="status" id="status">Status: Standby</div>
+      <button onclick="launchBruteForce()">Start brute force attack</button>
+      <div class="legal">Legal notice: Using Password Cracker™ for harmful and illegal activities is strictly prohibited
+        and punishable by death!</div>
+    </div>
+  </div>
+
+  <!-- DECRYPTOR WINDOW -->
+  <div class="window" id="decryptorWindow">
+    <div class="window-header" onmousedown="startDrag(event, 'decryptorWindow')">
+      Decryptor <span class="close-btn" onclick="closeWindow('decryptorWindow')">X</span>
+    </div>
+    <div class="window-body">
+      <div class="field">
+        File to decrypt: <input type="text" id="decryptFile" placeholder="backup.zip">
+      </div>
+      <div class="field">
+        Wordlist:
+        <select id="decryptWordlist">
+          <option>rockyou.txt</option>
+          <option>common-passwords.txt</option>
+          <option>top1000.txt</option>
+        </select>
+      </div>
+      <div class="terminal-output" id="decryptOutput">Ready to crack...</div>
+      <div class="status" id="decryptStatus">Status: Standby</div>
+      <button onclick="launchDecryptor()">Start cracking</button>
+      <button id="openDecryptedBtn" onclick="openDecryptedFile()" style="display:none;">📂 Open Decrypted File</button>
+      <div class="legal">Warning: Simulated cracking tool for training purposes only.</div>
+    </div>
+  </div>
+
+  <!-- SYSTEM PANEL (RIGHT SIDE) -->
+  <div
+    style="position: fixed; top: 20px; right: 20px; width: 300px; background: #1e2a33; border: 1px solid #607d8b; padding: 15px; color: #cfd8dc; font-family: monospace; font-size: 12px; border-radius: 6px; box-shadow: 0 0 12px rgba(0,255,255,0.1); z-index: 999;">
+    <div style="border-bottom: 1px solid #607d8b; padding-bottom: 8px; margin-bottom: 8px;">
+      <div style="font-size: 18px; font-weight: bold;">🕒 <span id="clock">--:--:--</span></div>
+      <div>Uptime: <span id="uptime">0h 00m</span></div>
+    </div>
+    <div style="margin-bottom: 10px;">
+      <div style="font-weight: bold;">CPU Usage</div>
+      <div><progress id="cpuProgress" value="0" max="100" style="width: 100%;"></progress></div>
+    </div>
+    <div style="margin-bottom: 10px;">
+      <div style="font-weight: bold;">Temperature</div>
+      <div>Avg: <span id="temp">42°C</span></div>
+    </div>
+    <div style="margin-bottom: 10px;">
+      <div style="font-weight: bold;">Memory</div>
+      <div>3.4 GB / 8 GB</div>
+      <div><progress value="3400" max="8000" style="width: 100%;"></progress></div>
+    </div>
+    <div>
+      <div style="font-weight: bold; margin-bottom: 4px;">Top Processes</div>
+      <div style="display: flex; flex-direction: column; gap: 2px;">
+        <span>edex-ui ............ 10.3%</span>
+        <span>gnome-shell ........ 5.4%</span>
+        <span>Xorg ............... 3.1%</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- REMOTE CONNECTION (RIGHT SIDE) -->
+  <div class="window" id="remoteDesktopWindow">
+    <div class="window-header" onmousedown="startDrag(event, 'remoteDesktopWindow')">
+      Remote File Connection <span class="close-btn" onclick="closeWindow('remoteDesktopWindow')">X</span>
+    </div>
+    <div class="window-body">
+      <div class="field">Target IP: <input type="text" id="remoteIp" value="192.168.1.42"></div>
+    
+      <!-- Option d'accès rapide -->
+      <div class="field">
+        <label><input type="checkbox" id="quickAccess" onchange="toggleAuthFields()"> Debug access enabled</label>
+      </div>
+    
+      <!-- Champs d'authentification (masqués si fast-mode) -->
+      <div id="authFields">
+        <div class="field">Username: <input type="text" id="remoteUser" value="USERNAME"></div>
+        <div class="field">Password: <input type="password" id="remotePass" value=""></div>
+      </div>
+    
+      <button onclick="connectRemote()">Connect</button>
+      <div id="remoteContent" style="margin-top:15px;"></div>
+    </div>
+    
+    
+  </div>
+
+
+  <!-- PHISHING WINDOWS -->
+  <div class="window" id="phishingWindow">
+    <div class="window-header" onmousedown="startDrag(event, 'phishingWindow')">
+      Phishing Tool <span class="close-btn" onclick="closeWindow('phishingWindow')">X</span>
+    </div>
+    <div class="window-body">
+      <div class="field">
+        Target Email: <input type="text" id="phishEmail" value="username@email.com">
+      </div>
+      <div class="field">
+        Template:
+        <select id="phishTemplate" onchange="updatePhishPreview()">
+          <option value=""></option>
+          <option value="facebook">Facebook</option>
+          <option value="google">Google</option>
+          <option value="microsoft">Microsoft</option>
+          <option value="linkedin">LinkedIn</option>
+        </select>
+      </div>
+      <div class="terminal-output" id="phishPreview">
+
+      </div>
+      <button onclick="launchPhishing()">Launch phishing</button>
+      <button id="emailPhishingBtn" style="cursor: not-allowed;" disabled onclick="launchEmailPhishing()">Email
+        verification phishing</button>
+    </div>
+  </div>
+
+
+
+
+  <!-- MOBILE CONTROL WINDOW -->
+  <div class="window" id="mobileControlWindow">
+    <div class="window-header" onmousedown="startDrag(event, 'mobileControlWindow')">
+      Mobile Control <span class="close-btn" onclick="closeWindow('mobileControlWindow')">X</span>
+    </div>
+
+    <div class="window-body" style="padding:15px;overflow:hidden;">
+
+      <!-- FORMULAIRE DE CONNEXION -->
+      <div id="mobileConnectForm">
+        <div class="field">
+          Mobile IP : <input type="text" id="mobileIp" value="192.168.1.42">
+        </div>
+        <button onclick="connectMobile()">Connect</button>
+        <div id="mobileConnectStatus" class="status" style="margin-top:8px;">Status : Awaiting connection…</div>
+      </div>
+
+      <!-- IFRAME MOBILE (caché jusqu’à la connexion) -->
+      <div id="mobileIframeBox" style="display:none;width:100%;height:100%;">
+        <iframe id="mobileIframe" src="" frameborder="0" style="width:100%;height:100%;"></iframe>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- NETWORK SCANNER WINDOW -->
+  <div class="window" id="networkScannerWindow">
+    <div class="window-header" onmousedown="startDrag(event, 'networkScannerWindow')">
+      Network Scanner <span class="close-btn" onclick="closeWindow('networkScannerWindow')">X</span>
+    </div>
+
+    <div class="window-body" style="padding:15px;overflow:hidden;">
+
+      <!-- connexion admin -->
+      <div id="netLoginBox">
+        <div class="field">Target IP : <input type="text" id="netIp" value="192.168.1.42"></div>
+        <div class="field">Admin : <input type="text" id="netUser" value="admin"></div>
+        <div class="field">Password : <input type="password" id="netPass" value=""></div>
+        <button onclick="connectScanner()">Connect</button>
+        <div id="netStatus" class="status" style="margin-top:8px;">Status : Waiting…</div>
+      </div>
+
+      <!-- résultat scan -->
+      <div id="netScanBox" style="display:none;flex:1;overflow-y:auto;">
+        <button class="btn" onclick="scanNetwork()">Scan LAN</button>
+        <div id="scanResults" style="margin-top:10px;"></div>
+      </div>
+
+    </div>
+  </div>
+
+
+
+  <!-- PEGASUS WINDOW -->
+  <div class="window" id="pegasusWindow">
+    <div class="window-header" onmousedown="startDrag(event, 'pegasusWindow')">
+      Pegasus RCE <span class="close-btn" onclick="closeWindow('pegasusWindow')">X</span>
+    </div>
+
+    <div class="window-body">
+      <div class="field">
+        Target IP : <input type="text" id="pegasusIp" value="192.168.1.1">
+      </div>
+
+      <!-- nouvelle combobox de vulnérabilités -->
+      <div class="field">
+        Exploit :
+        <select id="pegasusExploit">
+          <option value="stagefright" data-os="Android">CVE-2023-21096 – Android &lt; 14.0</option>
+          <option value="dirtycow" data-os="Linux">Dirty Cow (CVE-2016-5195) – Linux</option>
+          <option value="sockpuppet" data-os="iOS">Sock Puppet (CVE-2019-8605) – iOS &lt; 12.4</option>
+          <option value="bluekeep" data-os="Windows">BlueKeep (CVE-2019-0708) – Windows &lt; 10</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>
+          <input type="checkbox" id="pegasusSilent" checked>
+          Disable system notifications
+        </label>
+      </div>
+
+      <button onclick="launchPegasus()">Run exploit</button>
+      <div id="pegasusStatus" class="status" style="margin-top:10px;">Status : Idle</div>
+    </div>
+  </div>
+
+
+
+
+
+
+  <script src="main.js"></script>
+  <script src="bruteforce.js"></script>
+  <script src="decryptor.js"></script>
+  <script src="remoteDesktop.js"></script>
+  <script src="phishing.js"></script>
+  <script src="networkScanner.js"></script>
+  <script src="pegasus.js"></script>
+</body>
+
+</html>
