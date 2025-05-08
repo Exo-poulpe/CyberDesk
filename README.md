@@ -13,7 +13,7 @@ This is a **pedagogical simulation** designed to raise awareness about common cy
 
 ## 🎬 Scenario
 
-You’ve identified the **Chief Financial Officer** (CFO) of a major company as your target.  
+You’ve identified the **Chief Financial Officer** (CFO) of a major company as your target (alice@gmail.com).  
 She shared a **Facebook screenshot**, which revealed her Facebook email address.
 
 Armed with that single clue, your mission is to **gain access to her company’s internal systems** and eventually reach her **personal smartphone**, where sensitive banking data is stored.
